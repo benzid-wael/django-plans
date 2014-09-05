@@ -18,7 +18,7 @@ setup(
     author='Wael BEN ZID ELGUEBSI',
     author_email='benzid.wael@hotmail.fr',
     version=version,
-    url='https://github.com/benzid_wael/django-plans',
+    url='https://github.com/benzid-wael/django-plans',
     packages=['plans'],
     description='Dajngo application to manage plans and features',
     long_description=readme,
