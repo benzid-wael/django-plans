@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
-
 from __future__ import unicode_literals
+
+import six
 
 from django.db import models
 from django.utils.encoding import python_2_unicode_compatible
@@ -70,7 +71,7 @@ class Plan(models.Model):
         return self.name
 
     def __unicode__(self):
-        return u'%s' % self.name
+        return six.u('%s' % self.name)
 
     @classmethod
     def get_default_plan(cls):
@@ -81,5 +82,3 @@ class Plan(models.Model):
             return cls.objects.filter(default=True).order_by('-pk')[0]
         except IndexError:
             return None
-
-
