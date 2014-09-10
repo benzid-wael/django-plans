@@ -40,7 +40,7 @@ class CreditCard(models.Model):
         """
         Returns a masked number.
         """
-        return '%s******%s' % (self.iin[:6], self.iin[-4:])
+        return six.u('%s******%s' % (self.iin[:6], self.iin[-4:]))
 
 
 @python_2_unicode_compatible
