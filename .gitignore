@@ -4,3 +4,6 @@
 # Backup files
 *.sw[po]
 *~
+
+# Egg files
+*.egg-info
