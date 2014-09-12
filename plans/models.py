@@ -77,6 +77,8 @@ class Plan(models.Model):
         """
         Returns the recent default plan.
         """
+        # FIXME this does not make any sense, we should got this from project
+        # settings. Also, remove the default field.
         try:
             return cls.objects.filter(default=True).order_by('-pk')[0]
         except IndexError:
@@ -109,11 +111,14 @@ class BillingInfo(models.Model):
         return self.user.get_username()
 
 
+@python_2_unicode_compatible
 class UserVault(models.Model):
     """
     Stores User vaults.
     """
     user = models.ForeignKey(User, verbose_name=_('User'))
+    # FIXME May be it's better to remove CreditCard, as we need only the 
+    # vault_id
     credit_card = models.OneToOneField(CreditCard, null=True)
     vault_id = models.CharField(_('Vault ID'), max_length=64, unique=True)
     token = models.CharField(_('Token'), max_length=10, editable=False,
