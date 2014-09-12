@@ -8,6 +8,8 @@ from django.utils.encoding import python_2_unicode_compatible
 from django.utils.translation import ugettext_lazy as _
 from django.contrib.auth.models import User
 
+from django_countries.fields import CountryField
+
 
 @python_2_unicode_compatible
 class CreditCard(models.Model):
@@ -82,3 +84,29 @@ class Plan(models.Model):
             return cls.objects.filter(default=True).order_by('-pk')[0]
         except IndexError:
             return None
+
+
+@python_2_unicode_compatible
+class BillingInfo(models.Model):
+    """
+    Stores customer billing information.
+    """
+    user = models.OneToOneField(User, verbose_name=_('user'))
+    tax_number = models.CharField(_('VAT'), max_length=200, blank=True, db_index=True)
+    name = models.CharField(_('Name'), max_length=200, db_index=True)
+    street = models.CharField(_('Street'), max_length=200)
+    zipcode = models.CharField(_('Zip code'), max_length=200)
+    city = models.CharField(_('City'), max_length=200)
+    country = CountryField(_("Country"))
+
+    # FIXME Should I move this info into another model
+    shipping_name = models.CharField(_('Name (shipping)'), max_length=200, blank=True, help_text=_('optional'))
+    shipping_street = models.CharField(_('Street (shipping)'), max_length=200, blank=True, help_text=_('optional'))
+    shipping_zipcode = models.CharField(_('Zip code (shipping)'), max_length=200, blank=True, help_text=_('optional'))
+    shipping_city = models.CharField(_('City (shipping)'), max_length=200, blank=True, help_text=_('optional'))
+
+    created = models.DateTimeField(auto_now_add=True)
+    modified = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return self.user.get_username()
