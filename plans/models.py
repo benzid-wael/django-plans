@@ -91,7 +91,8 @@ class BillingInfo(models.Model):
     Stores customer billing information.
     """
     user = models.OneToOneField(User, verbose_name=_('user'))
-    tax_number = models.CharField(_('VAT'), max_length=200, blank=True, db_index=True)
+    tax_number = models.CharField(_('VAT'), max_length=200, blank=True,
+                                  db_index=True)
     name = models.CharField(_('Name'), max_length=200, db_index=True)
     street = models.CharField(_('Street'), max_length=200)
     zipcode = models.CharField(_('Zip code'), max_length=200)
@@ -99,10 +100,14 @@ class BillingInfo(models.Model):
     country = CountryField(_("Country"))
 
     # FIXME Should I move this info into another model
-    shipping_name = models.CharField(_('Name (shipping)'), max_length=200, blank=True, help_text=_('optional'))
-    shipping_street = models.CharField(_('Street (shipping)'), max_length=200, blank=True, help_text=_('optional'))
-    shipping_zipcode = models.CharField(_('Zip code (shipping)'), max_length=200, blank=True, help_text=_('optional'))
-    shipping_city = models.CharField(_('City (shipping)'), max_length=200, blank=True, help_text=_('optional'))
+    shipping_name = models.CharField(_('Name (shipping)'), max_length=200,
+                                     blank=True, help_text=_('optional'))
+    shipping_street = models.CharField(_('Street (shipping)'), max_length=200, 
+                                       blank=True, help_text=_('optional'))
+    shipping_zipcode = models.CharField(_('Zip code (shipping)'), blank=True,
+                                        max_length=200, help_text=_('optional'))
+    shipping_city = models.CharField(_('City (shipping)'), max_length=200,
+                                     blank=True, help_text=_('optional'))
 
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
@@ -131,3 +136,51 @@ class UserVault(models.Model):
         Charges the users credit card, with he provided amount.
         """
         raise NotImplementedError
+
+    def subscribe(self, plan):
+        """
+        Subscribe user to the provided plan.
+        :param plan: plan's slug.
+        :type plan: str.
+        """
+        raise NotImplementedError
+
+
+@python_2_unicode_compatible
+class Subscription(models.Model):
+    """
+    Stores subscription.
+    """
+    PENDING, ACTIVE, PAST_DUE, EXPIRED, CANCELED = (
+        "Pending",
+        "Active",
+        "Past Due",
+        "Expired",
+        "Canceled",
+    )
+    STATUS_CHOICES = (
+            (PENDING, 'pending'),
+            (ACTIVE, 'active'),
+            (PAST_DUE, 'past due'),
+            (EXPIRED, 'expired'),
+            (CANCELED, 'canceled')
+    )
+    subscription_id = models.CharField(max_length=10, unique=True,
+                                       editable=False)
+    user_vault = models.ForeignKey(UserVault, verbose_name=_("User's Vault"))
+    plan = models.ForeignKey(Plan, verbose_name=_("Plan"))
+    status = models.CharField(_("Status"), max_length=9, choices=STATUS_CHOICES)
+    next_billing_date = models.DateField(_("Next billing date"))
+    created = models.DateTimeField(auto_now_add=True)
+    modified = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return self.subscription_id
+
+    @property
+    def first_billing_date(self):
+        """
+        Returns first billing date.
+        """
+        raise NotImplementedError
+
