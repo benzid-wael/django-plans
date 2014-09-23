@@ -10,6 +10,8 @@ from django.contrib.auth.models import User
 
 from django_countries.fields import CountryField
 
+from .conf import plan_settings
+
 
 @python_2_unicode_compatible
 class CreditCard(models.Model):
@@ -75,10 +77,10 @@ class Plan(models.Model):
     @classmethod
     def get_default_plan(cls):
         """
-        Returns the recent default plan.
+        Returns the defined default plan in settings or the recent default plan.
         """
-        # FIXME this does not make any sense, we should got this from project
-        # settings. Also, remove the default field.
+        if plan_settings.DEFAULT_PLAN:
+            return plan_settings.DEFAULT_PLAN
         try:
             return cls.objects.filter(default=True).order_by('-pk')[0]
         except IndexError:
@@ -118,7 +120,7 @@ class UserVault(models.Model):
     """
     user = models.ForeignKey(User, verbose_name=_('User'))
     # FIXME May be it's better to remove CreditCard, as we need only the 
-    # vault_id
+    # vault_id.
     credit_card = models.OneToOneField(CreditCard, null=True)
     vault_id = models.CharField(_('Vault ID'), max_length=64, unique=True)
     token = models.CharField(_('Token'), max_length=10, editable=False,
