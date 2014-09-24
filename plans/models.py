@@ -13,6 +13,9 @@ from django_countries.fields import CountryField
 from .conf import plan_settings
 
 
+_logger = logging.getLogger("plans.models")
+
+
 @python_2_unicode_compatible
 class CreditCard(models.Model):
     """
@@ -154,3 +157,48 @@ class PaymentLog(models.Model):
             '%s charged %s %s - %s' % (self.user, self.amount,
                                        self.currency, self.transaction_id)
         )
+
+
+@python_2_unicode_compatible
+class Subscription(models.Model):
+    PENDING, ACTIVE, PAST_DUE, EXPIRED, CANCELED = (
+        "pending",
+        "active",
+        "past Due",
+        "expired",
+        "canceled",
+    )
+    STATUS_CHOICES = (
+        (PENDING, 'Pending'),
+        (ACTIVE, 'Active'),
+        (PAST_DUE, 'Past due'),
+        (EXPIRED, 'Expired'),
+        (CANCELED, 'Canceled')
+    )
+    subscription_id = models.CharField(_('Subscription'), max_length=10,
+                                       unique=True)
+    user_vault = models.ForeignKey(UserVault, verbose_name=_("User's vault"))
+    plan = models.ForeignKey(Plan, verbose_name=_("Plan"))
+    # Subscription state fields
+    status = models.CharField(_('Status'), max_length=10, choices=STATUS_CHOICES)
+    start_date = models.DateField(_('Start date'), default=datetime.now().date())
+    next_billing_date = models.DateField(_('Next billing date'), editable=False)
+    end_date = models.DateField(blank=True, null=True)
+    created = models.DateTimeField(auto_now_add=True)
+    modified = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return "%s: %s: %s" % (
+            self.user_vault.user,
+            self.subscription_id,
+            self.status
+        )
+
+    def is_running(self):
+        return (self.status in [Subscription.PENDING,
+                                Subscription.ACTIVE,
+                                Subscription.PAST_DUE])
+
+    def cancel(self):
+        """ Cancel this subscription instantly """
+        raise NotImplementedError
