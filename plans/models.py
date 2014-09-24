@@ -100,6 +100,7 @@ class BillingInfo(models.Model):
     city = models.CharField(_('City'), max_length=200)
     country = CountryField(_("Country"))
 
+    # Shipping information
     # FIXME Should I move this info into another model
     shipping_name = models.CharField(_('Name (shipping)'), max_length=200, blank=True, help_text=_('optional'))
     shipping_street = models.CharField(_('Street (shipping)'), max_length=200, blank=True, help_text=_('optional'))
@@ -133,3 +134,21 @@ class UserVault(models.Model):
         Charges the users credit card, with he provided amount.
         """
         raise NotImplementedError
+
+
+class PaymentLog(models.Model):
+    """
+    Logging raw charges made to a users credit card.
+    """
+    user = models.ForeignKey(User)
+    transaction_id = models.CharField(max_length=128)
+    amount = models.DecimalField(max_digits=7, decimal_places=2)
+    currency = models.CharField(_('Currency'), max_length=3, default='EUR')
+    created = models.DateTimeField(auto_now_add=True)
+    modified = models.DateTimeField(auto_now=True)
+
+    def __unicode__(self):
+        return (
+            '%s charged %s %s - %s' % (self.user, self.amount,
+                                       self.currency, self.transaction_id)
+        )
