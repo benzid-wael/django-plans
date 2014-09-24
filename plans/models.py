@@ -140,7 +140,7 @@ class PaymentLog(models.Model):
     """
     Logging raw charges made to a users credit card.
     """
-    user = models.ForeignKey(User)
+    vault = models.ForeignKey(UserVault)
     transaction_id = models.CharField(max_length=128)
     amount = models.DecimalField(max_digits=7, decimal_places=2)
     currency = models.CharField(_('Currency'), max_length=3, default='EUR')
