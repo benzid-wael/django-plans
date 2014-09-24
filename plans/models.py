@@ -136,6 +136,7 @@ class UserVault(models.Model):
         raise NotImplementedError
 
 
+@python_2_unicode_compatible
 class PaymentLog(models.Model):
     """
     Logging raw charges made to a users credit card.
@@ -147,7 +148,7 @@ class PaymentLog(models.Model):
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
 
-    def __unicode__(self):
+    def __str__(self):
         return (
             '%s charged %s %s - %s' % (self.user, self.amount,
                                        self.currency, self.transaction_id)
