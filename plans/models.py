@@ -2,6 +2,9 @@
 from __future__ import unicode_literals
 
 import six
+import logging
+
+from datetime import datetime
 
 from django.db import models
 from django.utils.encoding import python_2_unicode_compatible
@@ -96,7 +99,8 @@ class BillingInfo(models.Model):
     Stores customer billing information.
     """
     user = models.OneToOneField(User, verbose_name=_('user'))
-    tax_number = models.CharField(_('VAT'), max_length=200, blank=True, db_index=True)
+    tax_number = models.CharField(_('VAT'), max_length=200, blank=True,
+                                  db_index=True)
     name = models.CharField(_('Name'), max_length=200, db_index=True)
     street = models.CharField(_('Street'), max_length=200)
     zipcode = models.CharField(_('Zip code'), max_length=200)
@@ -105,10 +109,14 @@ class BillingInfo(models.Model):
 
     # Shipping information
     # FIXME Should I move this info into another model
-    shipping_name = models.CharField(_('Name (shipping)'), max_length=200, blank=True, help_text=_('optional'))
-    shipping_street = models.CharField(_('Street (shipping)'), max_length=200, blank=True, help_text=_('optional'))
-    shipping_zipcode = models.CharField(_('Zip code (shipping)'), max_length=200, blank=True, help_text=_('optional'))
-    shipping_city = models.CharField(_('City (shipping)'), max_length=200, blank=True, help_text=_('optional'))
+    shipping_name = models.CharField(_('Name (shipping)'), max_length=200,
+                                     blank=True, help_text=_('optional'))
+    shipping_street = models.CharField(_('Street (shipping)'), max_length=200, 
+                                       blank=True, help_text=_('optional'))
+    shipping_zipcode = models.CharField(_('Zip code (shipping)'), blank=True,
+                                        max_length=200, help_text=_('optional'))
+    shipping_city = models.CharField(_('City (shipping)'), max_length=200,
+                                     blank=True, help_text=_('optional'))
 
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
@@ -157,10 +165,21 @@ class PaymentLog(models.Model):
             '%s charged %s %s - %s' % (self.user, self.amount,
                                        self.currency, self.transaction_id)
         )
+    
+    def subscribe(self, plan):
+        """
+        Subscribe user to the provided plan.
+        :param plan: plan's slug.
+        :type plan: str.
+        """
+        raise NotImplementedError
 
 
 @python_2_unicode_compatible
 class Subscription(models.Model):
+    """
+    Stores subscription.
+    """
     PENDING, ACTIVE, PAST_DUE, EXPIRED, CANCELED = (
         "pending",
         "active",
@@ -183,7 +202,7 @@ class Subscription(models.Model):
     status = models.CharField(_('Status'), max_length=10, choices=STATUS_CHOICES)
     start_date = models.DateField(_('Start date'), default=datetime.now().date())
     next_billing_date = models.DateField(_('Next billing date'), editable=False)
-    end_date = models.DateField(blank=True, null=True)
+    end_date = models.DateField(_('End date'), blank=True, null=True)
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
 
@@ -200,5 +219,14 @@ class Subscription(models.Model):
                                 Subscription.PAST_DUE])
 
     def cancel(self):
-        """ Cancel this subscription instantly """
+        """
+        Cancel this subscription instantly.
+        """
+        raise NotImplementedError
+
+    @property
+    def first_billing_date(self):
+        """
+        Returns first billing date.
+        """
         raise NotImplementedError
