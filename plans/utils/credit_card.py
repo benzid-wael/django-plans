@@ -72,3 +72,22 @@ class CreditCard(object):
         """
         return self.is_luhn_valid() and self._checks_attrs() and not \
                     self.is_expired()
+
+
+class Visa(CreditCard):
+    card_name = "Visa"
+    regexp = re.compile("^4\d{12}(\d{3})?$")
+
+class MasterCard(CreditCard):
+    card_name = "MasterCard"
+    regexp = re.compile("^(5[1-5]\d{4}|677189)\d{10}$")
+
+class AmericanExpress(CreditCard):
+    card_name = "Amex"
+    regexp = re.compile("^3[47]\d{13}$")
+
+class Discover(CreditCard):
+    card_name = "Discover"
+    regexp = re.compile("^(6011|65\d{2})\d{12}$")
+
+cards = [Visa, MasterCard, AmericanExpress, Discover]
