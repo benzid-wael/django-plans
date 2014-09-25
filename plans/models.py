@@ -24,8 +24,6 @@ class CreditCard(models.Model):
     """
     CreditCard model.
     """
-    iin = models.CharField(_('IIN'), max_length=6, editable=False,
-              help_text=_('The first 6 digits of the credit card number'))
     default = models.BooleanField(_('Default'), default=False, editable=False)
     card_type = models.CharField(_('Card Type'), max_length=20, editable=False)
     cardholder_name = models.CharField(max_length=40)
@@ -40,7 +38,14 @@ class CreditCard(models.Model):
     modified = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return '<%s: %s>' % (self.user.get_username(), self.iin)
+        return '<%s: %s>' % (self.user.get_username(), self.ccn)
+
+    @property
+    def iin(self):
+        """
+        Returns the IIN (Issuer Identification Number).
+        """
+        return self.ccn[:6]
 
     @property
     def masked_number(self):
