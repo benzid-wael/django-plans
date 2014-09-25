@@ -6,6 +6,9 @@ import calendar
 from datetime import datetime
 
 
+class CardNotSupported(Exception):
+    pass
+
 class RegExpError(Exception):
     pass
 
