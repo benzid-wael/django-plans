@@ -57,13 +57,14 @@ class CreditCard(object):
                                              )
         )
 
-    def _check_number(self):
+    @classmethod
+    def check_number(cls, number):
         """
         Checks the credit number.
         """
-        if not self.regexp:
+        if not cls.regexp:
             raise RegExpError
-        return bool(re.match(self.regexp, self.number))
+        return bool(re.match(cls.regexp, number))
 
     def is_valid(self):
         """
