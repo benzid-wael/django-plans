@@ -42,8 +42,11 @@ class CreditCard(object):
         Checks if the required attributes is given and not empty
         and the credit card number is composed from 16 digits.
         """
-        return self.name and (len(self.number) == 16) and self.cvv and \
-                    self.year and self.month
+        try:
+            int(self.number)
+        except ValueError:
+            return False
+        return self.name and self.cvv and self.year and self.month
 
     def is_expired(self):
         "Checks if the card is expired or not."
