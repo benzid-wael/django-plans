@@ -1,0 +1,70 @@
+# -*- coding: utf-8 -*-
+
+import re
+import calendar
+
+from datetime import datetime
+
+
+class RegExpError(Exception):
+    pass
+
+
+class CreditCard(object):
+    """
+    Class to represents the existing credit cards and validate it.
+    """
+    # regexp to validate the credit card number
+    regexp = None
+    card_name = None
+    def __init__(self, name, number, cvv, year, month):
+        self.name = name
+        self.number = number
+        self.cvv = cvv
+        self.month = month
+        self.year = year
+
+    def is_luhn_valid(self):
+        """
+        Checks if the credit card is valid using Luhn algorithm.
+        """
+        # See http://en.wikipedia.org/wiki/Luhn_algorithm
+        try:
+            digits = [int(d) for d in self.number]
+        except ValueError:
+            return False
+        checksum = sum(digits[::-2] + [sum(divmod(d * 2, 10)) for d \
+                            in digits[-2::-2]])
+        return checksum % 10 == 0
+
+    def _checks_attrs(self):
+        """
+        Checks if the required attributes is given and not empty
+        and the credit card number is composed from 16 digits.
+        """
+        return self.name and (len(self.number) == 16) and self.cvv and \
+                    self.year and self.month
+
+    def is_expired(self):
+        "Checks if the card is expired or not."
+        return (
+            datetime.today() > datetime.date(self.year, self.month,
+                                             calendar.monthrange(self.year,
+                                                                 self.month)[1]
+                                             )
+        )
+
+    def _check_number(self):
+        """
+        Checks the credit number.
+        """
+        if not self.regexp:
+            raise RegExpError
+        return bool(re.match(self.regexp, self.number))
+
+    def is_valid(self):
+        """
+        Checks if the card is valid.
+        """
+        return self.is_luhn_valid() and self._checks_attrs() and not \
+                    self.is_expired()
