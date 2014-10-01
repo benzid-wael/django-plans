@@ -207,7 +207,8 @@ class Subscription(models.Model):
     status = models.CharField(_('Status'), max_length=10, choices=STATUS_CHOICES)
     start_date = models.DateField(_('Start date'), default=datetime.now().date())
     next_billing_date = models.DateField(_('Next billing date'), editable=False)
-    end_date = models.DateField(_('End date'), blank=True, null=True)
+    # TODO remove end_date
+    # end_date = models.DateField(_('End date'), blank=True, null=True)
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
 
@@ -235,3 +236,18 @@ class Subscription(models.Model):
         Returns first billing date.
         """
         raise NotImplementedError
+
+    def days_left(self):
+        if self.next_billing_date is None:
+            return None
+        else:
+            return (self.next_billing_date - datetime.today()).days
+
+    def is_active(self):
+        return self.active
+
+    def is_expired(self):
+        if self.next_billing_date is None:
+            return False
+        else:
+            return self.next_billing_date < datetime.today()
