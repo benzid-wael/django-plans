@@ -19,6 +19,10 @@ from .conf import plan_settings
 _logger = logging.getLogger("plans.models")
 
 
+class NotSubscribedError(Exception):
+    pass
+
+
 @python_2_unicode_compatible
 class CreditCard(models.Model):
     """
@@ -152,6 +156,10 @@ class UserVault(models.Model):
         """
         raise NotImplementedError
 
+    @property
+    def subscription(self):
+        raise NotImplementedError
+
     def subscribe(self, plan):
         """
         Subscribe user to the provided plan.
@@ -159,6 +167,15 @@ class UserVault(models.Model):
         :type plan: str.
         """
         raise NotImplementedError
+
+    def unsubscribe(self):
+        """
+        Unsubscribe user or raise NotSubscribedError if he does not have
+        any running subscription.
+        """
+        if self.subscription:
+            return self.subscription.unsubscribe()
+        return NotSubscribedError
 
 
 @python_2_unicode_compatible
@@ -184,6 +201,8 @@ class PaymentLog(models.Model):
 class Subscription(models.Model):
     """
     Stores subscription.
+
+    User should have only one running subscription.
     """
     PENDING, ACTIVE, PAST_DUE, EXPIRED, CANCELED = (
         "pending",
@@ -206,7 +225,8 @@ class Subscription(models.Model):
     # Subscription state fields
     status = models.CharField(_('Status'), max_length=10, choices=STATUS_CHOICES)
     start_date = models.DateField(_('Start date'), default=datetime.now().date())
-    next_billing_date = models.DateField(_('Next billing date'), editable=False)
+    next_billing_date = models.DateField(_('Next billing date'), null=True,
+                                         editable=False)
     # TODO remove end_date
     # end_date = models.DateField(_('End date'), blank=True, null=True)
     created = models.DateTimeField(auto_now_add=True)
@@ -243,10 +263,9 @@ class Subscription(models.Model):
         else:
             return (self.next_billing_date - datetime.today()).days
 
-    def is_active(self):
-        return self.active
-
     def is_expired(self):
+        if self.status == self.EXPIRED:
+            return True
         if self.next_billing_date is None:
             return False
         else:
