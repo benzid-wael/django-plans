@@ -152,6 +152,14 @@ class UserVault(models.Model):
         """
         raise NotImplementedError
 
+    def subscribe(self, plan):
+        """
+        Subscribe user to the provided plan.
+        :param plan: plan's slug.
+        :type plan: str.
+        """
+        raise NotImplementedError
+
 
 @python_2_unicode_compatible
 class PaymentLog(models.Model):
@@ -169,15 +177,7 @@ class PaymentLog(models.Model):
         return (
             '%s charged %s %s - %s' % (self.user, self.amount,
                                        self.currency, self.transaction_id)
-        )
-    
-    def subscribe(self, plan):
-        """
-        Subscribe user to the provided plan.
-        :param plan: plan's slug.
-        :type plan: str.
-        """
-        raise NotImplementedError
+       )
 
 
 @python_2_unicode_compatible
