@@ -23,6 +23,10 @@ class NotSubscribedError(Exception):
     pass
 
 
+class MultipleRunningSubscriptionError(Exception):
+    pass
+
+
 @python_2_unicode_compatible
 class CreditCard(models.Model):
     """
@@ -142,7 +146,7 @@ class UserVault(models.Model):
     user = models.ForeignKey(User, verbose_name=_('User'))
     # FIXME May be it's better to remove CreditCard, as we need only the 
     # vault_id.
-    credit_card = models.OneToOneField(CreditCard, null=True,
+    credit_card = models.OneToOneField(CreditCard, null=True, blank=True,
                                        verbose_name=_('Credit Card'))
     vault_id = models.CharField(_('Vault ID'), max_length=64, unique=True)
     token = models.CharField(_('Token'), max_length=10, editable=False,
@@ -158,7 +162,23 @@ class UserVault(models.Model):
 
     @property
     def subscription(self):
-        raise NotImplementedError
+        try:
+            running = [Subscription.PENDING, Subscription.ACTIVE,
+                       Subscription.PAST_DUE]
+            return Subscription.objects.get(user_vault=self,
+                                            status__in=running)
+        except Subscription.DoesNotExist:
+            return None
+        except Subscription.MultipleObjectsReturned:
+            raise MultipleRunningSubscriptionError(
+                "User {} is subscribed to many plans".format(self.user)
+            )
+
+    def __str__(self):
+        return '%s (%s)' % (
+            self.user.get_username(),
+            self.vault_id
+        )
 
     def subscribe(self, plan):
         """
@@ -174,7 +194,7 @@ class UserVault(models.Model):
         any running subscription.
         """
         if self.subscription:
-            return self.subscription.unsubscribe()
+            return self.subscription.cancel()
         return NotSubscribedError
 
 
