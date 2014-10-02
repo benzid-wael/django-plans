@@ -14,7 +14,7 @@ if not version_match:
 version = version_match.group(1)
 
 setup(
-    name='plan',
+    name='plans',
     author='Wael BEN ZID ELGUEBSI',
     author_email='benzid.wael@hotmail.fr',
     version=version,
@@ -24,6 +24,7 @@ setup(
     long_description=readme,
     install_requires=[
         "six>=1.7.3",
+        "django-countries==2.1.2",
     ],
     zip_safe=False,
     tests_require='nose',
