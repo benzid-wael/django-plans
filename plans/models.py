@@ -99,7 +99,7 @@ class Plan(models.Model):
         Returns the defined default plan in settings or the recent default plan.
         """
         if plan_settings.DEFAULT_PLAN:
-            return plan_settings.DEFAULT_PLAN
+            return cls.objects.get(name=plan_settings.DEFAULT_PLAN)
         try:
             return cls.objects.filter(default=True).order_by('-pk')[0]
         except IndexError:
