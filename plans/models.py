@@ -227,7 +227,7 @@ class Subscription(models.Model):
     PENDING, ACTIVE, PAST_DUE, EXPIRED, CANCELED = (
         "pending",
         "active",
-        "past Due",
+        "past_due",
         "expired",
         "canceled",
     )
