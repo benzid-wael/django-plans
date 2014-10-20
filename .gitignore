@@ -8,3 +8,6 @@
 
 # Egg files
 *.egg-info
+
+# Tests
+.coverage
