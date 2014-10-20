@@ -2,6 +2,7 @@
 
 import re
 import calendar
+import six
 
 from datetime import datetime
 
@@ -20,12 +21,29 @@ class CreditCard(object):
     # regexp to validate the credit card number
     regexp = None
     card_name = None
+
     def __init__(self, name, number, cvv, year, month):
         self.name = name
         self.number = number
         self.cvv = cvv
         self.month = month
         self.year = year
+
+    @property
+    def iin(self):
+        """
+        Returns the IIN (Issuer Identification Number).
+        """
+        # In the most cases, this is the first six digits of the credit card
+        # number
+        raise NotImplementedError
+
+    @property
+    def masked_number(self):
+        """
+        Returns a masked number.
+        """
+        return six.u('%s******%s' % (self.number[:6], self.number[-4:]))
 
     def is_luhn_valid(self):
         """
