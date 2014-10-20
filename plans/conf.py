@@ -4,7 +4,7 @@ Settings for plans application are all namespaced in PLANS setting.
 For exemple:
 
     PLANS = {
-        'DEFAULT_PLAN': 'plan_slug',
+        "DEFAULT_PLAN": "plan_name",
     }
 """
 
