@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from .utils.credit_card import CardNotSupported
+from plans.utils.credit_card import CardNotSupported
 
 
 class Gateway(object):
