@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Settings for plans applications are all namespaced in PLANS setting.
+Settings for plans application are all namespaced in PLANS setting.
 For exemple:
 
     PLANS = {
@@ -27,8 +27,6 @@ class Settings(object):
         self.default_settings = default_settings or {}
 
     def __getattr__(self, attr):
-        if not attr in self.defaults:
-            raise AttributeError("Invalid setting: %s" % attr)
         val = self.user_settings.get(attr, self.default_settings[attr])
         # Cache the result
         setattr(self, attr, val)
