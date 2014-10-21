@@ -27,8 +27,8 @@ setup(
         "django-countries==2.1.2",
     ],
     zip_safe=False,
-    tests_require='nose',
-    test_suite='nose.collector',
+    #tests_require=['coverage', 'nose'],
+    test_suite='runtests.runtests',
     classifiers=[
         'License :: OSI Approved :: GPL-V3 License',
         'Programming Language :: Python',
