@@ -30,6 +30,10 @@ DEFAULT_SETTINGS = {
 }
 
 
+class NotFoundAttribute(Exception):
+    pass
+
+
 class Settings(object):
     """
     A settings object that allows us to access to all settings as properties.
@@ -37,15 +41,16 @@ class Settings(object):
     def __init__(self, user_settings, default_settings):
         self.user_settings = user_settings or {}
         self.default_settings = default_settings or {}
-        self._check()
 
-    def _check(self):
+    def _check_gateway(self):
         """
-        Check all settings and raise ImproperlyConfigured if needed.
+        Check if the provided gateway is valid:
+        1) the gateway is required and should be a class
+        2) the gateway should inherits from the Gateway base class
         """
         try:
             self.gateway = load_class(self.BILLING_GATEWAY)
-        except KeyError:
+        except NotFoundAttribute:
             raise ImproperlyConfigured("No billing gateway specified in your "
                                        "settings.")
         except ImportError:
@@ -55,9 +60,13 @@ class Settings(object):
             )
         # check if the gateway inherits from the Gateway abstract class
         assert isinstance(self.gateway, Gateway)
-        # check the value of TAX_PERCENT setting
+
+    def _check_tax_percent(self):
+        """Check the value of TAX_PERCENT setting"""
         assert 0 <= self.TAX_PERCENT <= 100
-        # check TAXATION_POLICY setting
+
+    def _check_tax_policy(self):
+        """Check TAXATION_POLICY setting"""
         if self.TAXATION_POLICY:
             try:
                 self.tax_policy = load_class(self.TAXATION_POLICY)
@@ -68,6 +77,8 @@ class Settings(object):
                 )
 
     def __getattr__(self, attr):
+        if attr not in self.default_settings.keys():
+            raise NotFoundAttribute
         val = self.user_settings.get(attr, self.default_settings[attr])
         # Cache the result
         setattr(self, attr, val)
