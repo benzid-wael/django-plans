@@ -39,29 +39,31 @@ class SettingsTests(TestCase):
 
     @raises(ImproperlyConfigured)
     def test_notfound_gateway(self):
-        bad_setting = Settings(TEST_USER_SETTINGS.update({
-                                "BILLING_GATEWAY": "app.gateway.NotDefined"
-                               }), DEFAULT_SETTINGS)
+        test_user_setting = = {
+            "BILLING_GATEWAY": "app.gateway.NotDefined"
+        }
+        bad_setting = Settings(test_user_setting, DEFAULT_SETTINGS)
         bad_setting._check_gateway()
 
     @raises(ImproperlyConfigured)
     def test_gateway(self):
         """Verify if the specified gateway inherits from the Gateway class"""
-        bad_setting = Settings(TEST_USER_SETTINGS.update({
-                                "BILLING_GATEWAY": "tests.test_conf.BadGateway"
-                               }), DEFAULT_SETTINGS)
+        test_user_setting = = {
+            "BILLING_GATEWAY": "tests.test_conf.BadGateway"
+        }
+        bad_setting = Settings(test_user_setting, DEFAULT_SETTINGS)
         bad_setting._check_gateway()
 
     def test_braintree_gateway(self):
         setting = Settings(TEST_USER_SETTINGS, DEFAULT_SETTINGS)
         ret = setting._check_gateway()
-        print "### ", ret
         self.assertEqual(ret, None) # test does not raises any exception
 
     def test_getattr(self):
         expected = "django-plans"
-        setting = Settings(TEST_USER_SETTINGS.update({
-                            "APP_NAME": expected
-                           }), DEFAULT_SETTINGS)
+        test_user_setting = = {
+            "APP_NAME": expected
+        }
+        bad_setting = Settings(test_user_setting, DEFAULT_SETTINGS)
         app_name = setting.APP_NAME
         self.assertEqual(app_name, expected)
