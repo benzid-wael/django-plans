@@ -77,12 +77,13 @@ class Settings(object):
                 )
 
     def __getattr__(self, attr):
-        if attr not in self.default_settings.keys():
+        try:
+            val = self.user_settings.get(attr, self.default_settings[attr])
+            # Cache the result
+            setattr(self, attr, val)
+            return val
+        except KeyError:
             raise NotFoundAttribute
-        val = self.user_settings.get(attr, self.default_settings[attr])
-        # Cache the result
-        setattr(self, attr, val)
-        return val
 
 
 plan_settings = Settings(USER_SETTINGS, DEFAULT_SETTINGS)

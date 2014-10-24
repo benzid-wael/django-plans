@@ -39,7 +39,7 @@ class SettingsTests(TestCase):
 
     @raises(ImproperlyConfigured)
     def test_notfound_gateway(self):
-        test_user_setting = = {
+        test_user_setting = {
             "BILLING_GATEWAY": "app.gateway.NotDefined"
         }
         bad_setting = Settings(test_user_setting, DEFAULT_SETTINGS)
@@ -48,7 +48,7 @@ class SettingsTests(TestCase):
     @raises(ImproperlyConfigured)
     def test_gateway(self):
         """Verify if the specified gateway inherits from the Gateway class"""
-        test_user_setting = = {
+        test_user_setting = {
             "BILLING_GATEWAY": "tests.test_conf.BadGateway"
         }
         bad_setting = Settings(test_user_setting, DEFAULT_SETTINGS)
@@ -61,9 +61,9 @@ class SettingsTests(TestCase):
 
     def test_getattr(self):
         expected = "django-plans"
-        test_user_setting = = {
+        test_user_setting = {
             "APP_NAME": expected
         }
-        bad_setting = Settings(test_user_setting, DEFAULT_SETTINGS)
+        setting = Settings(test_user_setting, DEFAULT_SETTINGS)
         app_name = setting.APP_NAME
         self.assertEqual(app_name, expected)
