@@ -45,7 +45,7 @@ class SettingsTests(TestCase):
         bad_setting = Settings(test_user_setting, DEFAULT_SETTINGS)
         bad_setting._check_gateway()
 
-    @raises(ImproperlyConfigured)
+    @raises(AssertionError)
     def test_gateway(self):
         """Verify if the specified gateway inherits from the Gateway class"""
         test_user_setting = {
