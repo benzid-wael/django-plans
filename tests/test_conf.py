@@ -5,13 +5,13 @@ from nose.tools import raises
 from django.test import TestCase
 from django.core.exceptions import ImproperlyConfigured
 
-
+from plans.gateway.base import Gateway
 from plans.conf import Settings, DEFAULT_SETTINGS, NotFoundAttribute
 
 
 TEST_USER_SETTINGS = {
     "DEFAULT_PLAN": "default_plan_name",
-    "BILLING_GATEWAY": "plans.gateway.BraintreeGateway",
+    "BILLING_GATEWAY": "tests.test_conf.BillingGateway",
     "TEST_MODE": False,
     "STORE_CUSTOMER_INFO": False,
     "TAXATION_POLICY": "plans.taxation.EUTaxationPolicy",
@@ -20,6 +20,9 @@ TEST_USER_SETTINGS = {
 
 
 class BadGateway(object):
+    pass
+
+class BillingGateway(Gateway):
     pass
 
 
@@ -46,7 +49,7 @@ class SettingsTests(TestCase):
         bad_setting._check_gateway()
 
     @raises(AssertionError)
-    def test_gateway(self):
+    def test_gateway_api(self):
         """Verify if the specified gateway inherits from the Gateway class"""
         test_user_setting = {
             "BILLING_GATEWAY": "tests.test_conf.BadGateway"
@@ -54,8 +57,11 @@ class SettingsTests(TestCase):
         bad_setting = Settings(test_user_setting, DEFAULT_SETTINGS)
         bad_setting._check_gateway()
 
-    def test_braintree_gateway(self):
-        setting = Settings(TEST_USER_SETTINGS, DEFAULT_SETTINGS)
+    def test_good_gateway(self):
+        test_user_setting = {
+            "BILLING_GATEWAY": "tests.test_conf.BillingGateway"
+        }
+        setting = Settings(test_user_setting, DEFAULT_SETTINGS)
         ret = setting._check_gateway()
         self.assertEqual(ret, None) # test does not raises any exception
 
