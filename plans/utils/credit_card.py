@@ -58,25 +58,22 @@ class CreditCard(object):
                             in digits[-2::-2]])
         return checksum % 10 == 0
 
-    def _checks_attrs(self):
+    def _check_number(self):
         """
-        Checks if the required attributes is given and not empty
-        and the credit card number is composed from 16 digits.
+        Check if the credit card number is composed from digits.
         """
         try:
             int(self.number)
         except ValueError:
             return False
-        return self.name and self.cvv and self.year and self.month
+        return True
 
     def is_expired(self):
         "Checks if the card is expired or not."
-        return (
-            datetime.today() > datetime.date(self.year, self.month,
-                                             calendar.monthrange(self.year,
-                                                                 self.month)[1]
-                                             )
-        )
+        expired_date = datetime(self.year, self.month,
+                                calendar.monthrange(self.year, self.month)[1]
+                               )
+        return datetime.today() > expired_date
 
     @classmethod
     def check_number(cls, number):
@@ -91,7 +88,7 @@ class CreditCard(object):
         """
         Checks if the card is valid.
         """
-        return self.is_luhn_valid() and self._checks_attrs() and not \
+        return self.is_luhn_valid() and self._check_number() and not \
                     self.is_expired()
 
 
