@@ -3,6 +3,10 @@
 from plans.utils.credit_card import CardNotSupported
 
 
+class GatewayNotConfigured(Exception):
+    pass
+
+
 class Gateway(object):
     """
     Base class for all billing gateways.
