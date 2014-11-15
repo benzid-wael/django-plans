@@ -3,6 +3,7 @@
 from django.test import TestCase
 
 from plans.utils.credit_card import CreditCard, Visa
+from tests import credit_card
 
 
 class CreditCardTestCase(TestCase):
@@ -21,7 +22,7 @@ class CreditCardTestCase(TestCase):
         self.assertEqual(res, False)
 
     def test_expired_creditcard(self):
-        creditcard = CreditCard("John Doe", "4111111111111111", "111", 1990, 12)
+        creditcard = credit_card.expired_card
         res = creditcard.is_expired()
         self.assertEqual(res, True)
 
