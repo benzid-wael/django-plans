@@ -26,8 +26,7 @@ class BraintreeGateway(Gateway):
         if (not gateway_settings
                 or not gateway_settings.get("MERCHANT_ACCOUNT_ID")
                 or not gateway_settings.get("PUBLIC_KEY")
-                or not gateway_settings.get("PRIVATE_KEY")
-            ):
+                or not gateway_settings.get("PRIVATE_KEY")):
             raise GatewayNotConfigured("'%s' gateway is not correctly "
                                        "configured." % self.name)
         braintree.Configuration.configure(

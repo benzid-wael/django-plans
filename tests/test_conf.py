@@ -22,6 +22,7 @@ TEST_USER_SETTINGS = {
 class BadGateway(object):
     pass
 
+
 class BillingGateway(Gateway):
     pass
 
@@ -63,7 +64,8 @@ class SettingsTests(TestCase):
         }
         setting = Settings(test_user_setting, DEFAULT_SETTINGS)
         ret = setting._check_gateway()
-        self.assertEqual(ret, None) # test does not raises any exception
+        # test does not raises any exception
+        self.assertEqual(ret, None)
 
     def test_getattr(self):
         expected = "django-plans"

@@ -40,7 +40,8 @@ class CreditCardTestCase(TestCase):
         self.assertEqual(res, True)
 
     def test_non_luhn_valid_creditcard(self):
-        creditcard = CreditCard("John Doe", "4111123111111111", "111", 2022, 12)
+        creditcard = CreditCard("John Doe", "4111123111111111", "111", 2022,
+                                12)
         res = creditcard.is_luhn_valid()
         self.assertEqual(res, False)
 

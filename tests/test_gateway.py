@@ -3,7 +3,6 @@
 from nose.tools import raises
 
 from django.test import TestCase
-from django.core.exceptions import ImproperlyConfigured
 
 from plans.gateway.base import Gateway
 from plans.utils import credit_card
@@ -11,7 +10,6 @@ from plans.utils import credit_card
 from tests.credit_card import (
     visa_card,
     expired_visa,
-    expired_card,
     unsupported_card
 )
 
@@ -24,7 +22,7 @@ class SampleGateway(Gateway):
         credit_card.Visa,
         credit_card.MasterCard,
     ]
-    
+
 
 class GatewayTests(TestCase):
 

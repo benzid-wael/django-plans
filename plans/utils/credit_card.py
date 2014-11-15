@@ -10,6 +10,7 @@ from datetime import datetime
 class CardNotSupported(Exception):
     pass
 
+
 class RegExpError(Exception):
     pass
 
@@ -54,8 +55,8 @@ class CreditCard(object):
             digits = [int(d) for d in self.number]
         except ValueError:
             return False
-        checksum = sum(digits[::-2] + [sum(divmod(d * 2, 10)) for d \
-                            in digits[-2::-2]])
+        checksum = sum(digits[::-2] + [sum(divmod(d * 2, 10)) for d
+                                       in digits[-2::-2]])
         return checksum % 10 == 0
 
     def _check_number(self):
@@ -71,8 +72,7 @@ class CreditCard(object):
     def is_expired(self):
         "Checks if the card is expired or not."
         expired_date = datetime(self.year, self.month,
-                                calendar.monthrange(self.year, self.month)[1]
-                               )
+                                calendar.monthrange(self.year, self.month)[1])
         return datetime.today() > expired_date
 
     @classmethod
@@ -88,21 +88,24 @@ class CreditCard(object):
         """
         Checks if the card is valid.
         """
-        return self.is_luhn_valid() and self._check_number() and not \
-                    self.is_expired()
+        return (self.is_luhn_valid() and self._check_number()
+                and not self.is_expired())
 
 
 class Visa(CreditCard):
     card_name = "Visa"
     regexp = re.compile("^4\d{12}(\d{3})?$")
 
+
 class MasterCard(CreditCard):
     card_name = "MasterCard"
     regexp = re.compile("^(5[1-5]\d{4}|677189)\d{10}$")
 
+
 class AmericanExpress(CreditCard):
     card_name = "Amex"
     regexp = re.compile("^3[47]\d{13}$")
+
 
 class Discover(CreditCard):
     card_name = "Discover"
