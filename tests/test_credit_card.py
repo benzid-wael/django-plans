@@ -7,8 +7,14 @@ from plans.utils.credit_card import CreditCard, Visa
 
 class CreditCardTestCase(TestCase):
     def setUp(self):
-        self.creditcard = CreditCard("John Doe", "4111111111111111", "111", 2022,
-                                     12)
+        self.creditcard_data = {
+            "name": "John Doe",
+            "number": "4111111111111111",
+            "cvv": "111",
+            "year": 2022,
+            "month": 12
+        }
+        self.creditcard = CreditCard(**self.creditcard_data)
 
     def test_non_expired_creditcard(self):
         res = self.creditcard.is_expired()
@@ -49,5 +55,10 @@ class CreditCardTestCase(TestCase):
         ]
         res = any([cc.is_valid() for cc in bad_creditcards])
         self.assertEqual(res, False)
-        
-        
+
+    def test_valid_visa(self):
+        self.assertEqual(Visa.accept(self.creditcard_data['number']), True)
+
+    def test_invalid_visa(self):
+        self.assertEqual(Visa.accept("11111"), False)
+        self.assertEqual(Visa.accept("1111111111111111"), False)
