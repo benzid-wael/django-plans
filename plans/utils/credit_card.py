@@ -76,9 +76,9 @@ class CreditCard(object):
         return datetime.today() > expired_date
 
     @classmethod
-    def check_number(cls, number):
+    def accept(cls, number):
         """
-        Checks the credit number.
+        Checks if the given number is accepted for this credit card type.
         """
         if not cls.regexp:
             raise RegExpError

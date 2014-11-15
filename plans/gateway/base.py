@@ -23,7 +23,7 @@ class Gateway(object):
         """
         is_supported = False
         for card_type in self.supported_card_types:
-            if card_type.check_number(credit_card.number):
+            if card_type.accept(credit_card.number):
                 credit_card.card_type = card_type
                 is_supported = True
                 break
