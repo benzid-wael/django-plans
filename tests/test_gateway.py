@@ -49,7 +49,7 @@ class BraintreeGatewayTests(TestCase):
         test_user_settings = {
             "DEFAULT_PLAN": "plan_name",
             "BILLING_GATEWAY": (
-                "plans.gateway.braintree_payements.BraintreeGateway"
+                "plans.gateway.braintree_payments_gateway.BraintreeGateway"
             ),
             "GATEWAY_SETTINGS": {
                 "MERCHANT_ACCOUNT_ID": "your_merchant_account_id",
@@ -59,7 +59,10 @@ class BraintreeGatewayTests(TestCase):
             "TEST_MODE": True,
             "STORE_CUSTOMER_INFO": False,
         }
-        settings = Settings(test_user_settings, {})
+        import_strings = (
+            "BILLING_GATEWAY",
+        )
+        settings = Settings(test_user_settings, {}, import_strings)
         self.gateway = BraintreeGateway(test_mode=settings.TEST_MODE,
                                         gateway_settings=(
                                             settings.GATEWAY_SETTINGS
