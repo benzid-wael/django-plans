@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 import braintree
 
-from plans.conf import plan_settings
 from plans.utils.credit_card import Visa, MasterCard, AmericanExpress, Discover
 from .base import Gateway, GatewayNotConfigured
 
@@ -16,13 +15,13 @@ class BraintreeGateway(Gateway):
     default_currency = "USD"
     supported_card_types = [Visa, MasterCard, AmericanExpress, Discover]
 
-    def __init__(self):
-        test_mode = plan_settings.TEST_MODE
+    def __init__(self, **kwargs):
+        test_mode = kwargs.pop("test_mode", False)
+        gateway_settings = kwargs.pop("gateway_settings", {})
         if test_mode:
             env = braintree.Environment.Sandbox
         else:
             env = braintree.Environment.Production
-        gateway_settings = plan_settings.GATEWAY_SETTINGS
         if (not gateway_settings
                 or not gateway_settings.get("MERCHANT_ACCOUNT_ID")
                 or not gateway_settings.get("PUBLIC_KEY")
