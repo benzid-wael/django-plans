@@ -4,7 +4,9 @@ from nose.tools import raises
 
 from django.test import TestCase
 
+from plans.conf import Settings
 from plans.gateway.base import Gateway
+from plans.gateway.braintree_payments_gateway import BraintreeGateway
 from plans.utils import credit_card
 
 from tests.credit_card import (
@@ -40,3 +42,36 @@ class GatewayTests(TestCase):
     @raises(credit_card.CardNotSupported)
     def test_unsupported_card(self):
         self.gateway.validate(unsupported_card)
+
+
+class BraintreeGatewayTests(TestCase):
+    def setUp(self):
+        test_user_settings = {
+            "DEFAULT_PLAN": "plan_name",
+            "BILLING_GATEWAY": (
+                "plans.gateway.braintree_payments_gateway.BraintreeGateway"
+            ),
+            "GATEWAY_SETTINGS": {
+                "MERCHANT_ACCOUNT_ID": "your_merchant_account_id",
+                "PUBLIC_KEY": "your_public_key",
+                "PRIVATE_KEY": "your_private_key"
+            },
+            "TEST_MODE": True,
+            "STORE_CUSTOMER_INFO": False,
+        }
+        import_strings = (
+            "BILLING_GATEWAY",
+        )
+        settings = Settings(test_user_settings, {}, import_strings)
+        self.gateway = BraintreeGateway(test_mode=settings.TEST_MODE,
+                                        gateway_settings=(
+                                            settings.GATEWAY_SETTINGS
+                                        ))
+
+    def test_gateway_initialisation(self):
+        import braintree
+        is_sandbox = (
+            "sandbox" in
+            braintree.Configuration.environment._Environment__auth_url
+        )
+        self.assertEqual(is_sandbox, True)

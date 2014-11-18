@@ -43,6 +43,11 @@ class SettingsTests(TestCase):
         test_user_setting = {
             "APP_NAME": expected
         }
-        setting = Settings(test_user_setting, DEFAULT_SETTINGS, {})
+        setting = Settings(test_user_setting, DEFAULT_SETTINGS,
+                           IMPORT_STRINGS)
         app_name = setting.APP_NAME
         self.assertEqual(app_name, expected)
+
+    def test_access_billing_gateway(self):
+        gateway = self.settings.BILLING_GATEWAY
+        self.assertEqual(isinstance(gateway(), BillingGateway), True)
