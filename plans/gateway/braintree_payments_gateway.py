@@ -16,6 +16,7 @@ class BraintreeGateway(Gateway):
     supported_card_types = [Visa, MasterCard, AmericanExpress, Discover]
 
     def __init__(self, **kwargs):
+        # TODO this need to be executed only when server start.
         test_mode = kwargs.pop("test_mode", False)
         gateway_settings = kwargs.pop("gateway_settings", {})
         if test_mode:
