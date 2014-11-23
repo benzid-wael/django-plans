@@ -11,6 +11,10 @@ class CardNotSupported(Exception):
     pass
 
 
+class InvalidCard(Exception):
+    pass
+
+
 class RegExpError(Exception):
     pass
 
