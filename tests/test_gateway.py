@@ -45,6 +45,11 @@ class GatewayTests(TestCase):
 
 
 class BraintreeGatewayTests(TestCase):
+
+    """
+    General tests for Braintree gateway.
+    """
+
     def setUp(self):
         test_user_settings = {
             "DEFAULT_PLAN": "plan_name",
@@ -75,3 +80,11 @@ class BraintreeGatewayTests(TestCase):
             braintree.Configuration.environment._Environment__auth_url
         )
         self.assertEqual(is_sandbox, True)
+
+    def test_card_type(self):
+        self.gateway.validate(visa_card)
+        self.assertEqual(visa_card.card_type, credit_card.Visa)
+
+    def test_validate_visa_card(self):
+        ret = self.gateway.validate(visa_card)
+        self.assertTrue(ret)
