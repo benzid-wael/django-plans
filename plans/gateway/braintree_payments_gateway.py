@@ -46,9 +46,9 @@ class BraintreeGateway(Gateway):
     def charge(self, credit_card, amount, options=None):
         try:
             is_valid = (isinstance(credit_card, CreditCard)
-                        and not self.validate_card(credit_card))
+                        and self.validate(credit_card))
         except Exception as e:
-            return InvalidCard(six.text_type(e))
+            raise InvalidCard(six.text_type(e))
 
         if not is_valid:
             # TODO inject an `_error` attribute if the credit card is invalid
