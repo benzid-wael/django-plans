@@ -1,7 +1,8 @@
 #!/usr/bin/env python
-import sys
 
+import sys
 import django
+
 from django.conf import settings
 
 if not settings.configured:
@@ -23,6 +24,23 @@ if not settings.configured:
             'django_nose',
         ),
 
+        # Plans settings
+        PLANS={
+            "DEFAULT_PLAN": "Tester",
+            "BILLING_GATEWAY": (
+                "plans.gateway.braintree_payements.BraintreeGateway"
+            ),
+            "GATEWAY_SETTINGS": {
+                "MERCHANT_ACCOUNT_ID": "944fcnns6fsgdgv6",
+                "PUBLIC_KEY": "8bwvnx4hh2r8j45n",
+                "PRIVATE_KEY": "7839eaa9478072e88d48e89f43210b1c"
+            },
+            "TEST_MODE": True,
+            "STORE_CUSTOMER_INFO": False,
+            "TAXATION_POLICY": "plans.taxation.EUTaxationPolicy",
+            "TAX_PERCENT": "10",  # Tax is 10%
+        },
+
         # Use nose to run all tests
         TEST_RUNNER = 'django_nose.NoseTestSuiteRunner',
 
@@ -39,10 +57,11 @@ if not settings.configured:
 
 from django.test.utils import get_runner
 
+
 def runtests():
     if hasattr(django, 'setup'):
         django.setup()
-    apps = sys.argv[1:] or ['tests', ]
+    apps = sys.argv[1:] or ['tests']
     TestRunner = get_runner(settings)
     test_runner = TestRunner(verbosity=1, interactive=True, failfast=False)
     failures = test_runner.run_tests(apps)
@@ -50,5 +69,3 @@ def runtests():
 
 if __name__ == '__main__':
     runtests()
-
-
