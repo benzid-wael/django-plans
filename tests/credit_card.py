@@ -8,3 +8,4 @@ expired_visa = Visa("John Doe", "4111111111111111", "111", 1990, 12)
 expired_card = CreditCard("John Doe", "4111111111111111", "111", 1990, 12)
 
 unsupported_card = CreditCard("John Doe", "9991111111111111", "111", 1990, 12)
+bad_cvv = Visa("John Doe", "4111111111111111", "1111", 2090, 12)
