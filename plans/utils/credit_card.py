@@ -92,8 +92,11 @@ class CreditCard(object):
         """
         Checks if the card is valid.
         """
-        return (self.is_luhn_valid() and self._check_number()
-                and not self.is_expired())
+        return (self.is_luhn_valid() and not self.is_expired())
+
+    @property
+    def expiration_date(self):
+        return "{0}/{1}".format(self.month, self.year)
 
 
 class Visa(CreditCard):
