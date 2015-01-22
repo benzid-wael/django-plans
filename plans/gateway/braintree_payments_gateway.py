@@ -39,6 +39,34 @@ class BraintreeGateway(Gateway):
             gateway_settings['PRIVATE_KEY']
         )
 
+    def get_transaction(self, transaction_id):
+        """Return the transaction with the given ID if exists, else None"""
+        return braintree.Transaction.find(str(transaction_id))
+
+    def _build_errors(self, response, transaction=None, debug=False):
+        if response.is_success:
+            return None
+        result = {
+            "errors": [error.message for error in response.errors.deep_errors]
+        }
+        if response.transaction:
+            transaction = response.transaction
+        transaction_fields = {
+            "processor_declined": [
+                "processor_response_code", "processor_response_text"
+            ],
+            "gateway_rejected": ["gateway_rejection_reason"]
+        }
+        if transaction:
+            fields = transaction_fields.get(transaction.status, [])
+            result["transaction"] = {
+                "status": transaction.status
+            }
+            result["transaction"].update({
+                field: getattr(transaction, field) for field in fields
+            })
+        return result
+
     def _build_request(self, options=None):
         """Build braintree request from options."""
         request = {}
@@ -71,6 +99,7 @@ class BraintreeGateway(Gateway):
             raise InvalidCard()
 
         request = self._build_request(options)
+
         request["amount"] = amount
         request["credit_card"] = {
             "number": credit_card.number,
@@ -79,10 +108,36 @@ class BraintreeGateway(Gateway):
             "cvv": credit_card.cvv
         }
 
+        # Submitting transaction for settlement
+        request["options"] = {
+            "submit_for_settlement": True
+        }
+
         # Send request to braintree
         response = braintree.Transaction.sale(request)
         status = "success" if response.is_success else "failure"
-        return {
+        result = {
             "status": status,
-            "response": response
         }
+        if response.is_success:
+            result["transaction"] = {
+                "id": response.transaction.id,
+                "status": str(response.transaction.status)
+            }
+        result.update(self._build_errors(response) or {})
+        return result
+
+    def refund(self, transaction_id, amount=None):
+        transaction = self.get_transaction(str(transaction_id))
+        if not transaction:
+            raise ValueError("Bad transaction ID {}".format(transaction_id))
+        response = braintree.Transaction.refund(str(transaction_id), amount)
+        status = "success" if response.is_success else "failure"
+        result = {
+            "status": status,
+            "transaction": {
+                "status": transaction.status
+            }
+        }
+        result.update(self._build_errors(response, transaction) or {})
+        return result
