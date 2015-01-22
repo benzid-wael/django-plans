@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 
+import random
+
 from nose.tools import raises
 
 from django.test import TestCase
@@ -93,3 +95,14 @@ class BraintreeGatewayTests(TestCase):
             "other card types."
         )
         self.assertTrue(msg in response["errors"])
+
+    def test_refund_non_settled_transaction(self):
+        # Use random amount, to be sure that the braintree gateway will not
+        # consider the created transaction duplicated, See:
+        # http://support.braintreepayments.com/customer/portal/articles/1429427-processing-options#Duplicate
+        amount = random.randint(1, 1000)
+        charge_response = self.gateway.charge(visa_card, amount)
+        response = self.gateway.refund(charge_response["transaction"]["id"])
+        self.assertEqual(response["status"], "failure")
+        self.assertEqual(response["transaction"]["status"],
+                         "submitted_for_settlement")
