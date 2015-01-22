@@ -92,4 +92,4 @@ class BraintreeGatewayTests(TestCase):
             "CVV must be 4 digits for American Express and 3 digits for "
             "other card types."
         )
-        self.assertEqual(response["response"].message, msg)
+        self.assertTrue(msg in response["errors"])
