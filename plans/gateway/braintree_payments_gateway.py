@@ -41,7 +41,10 @@ class BraintreeGateway(Gateway):
 
     def get_transaction(self, transaction_id):
         """Return the transaction with the given ID if exists, else None"""
-        return braintree.Transaction.find(str(transaction_id))
+        transaction = braintree.Transaction.find(str(transaction_id))
+        if not transaction:
+            raise ValueError("Bad transaction ID {}".format(transaction_id))
+        return transaction
 
     def _build_errors(self, response, transaction=None, debug=False):
         if response.is_success:
@@ -129,8 +132,6 @@ class BraintreeGateway(Gateway):
 
     def refund(self, transaction_id, amount=None):
         transaction = self.get_transaction(str(transaction_id))
-        if not transaction:
-            raise ValueError("Bad transaction ID {}".format(transaction_id))
         response = braintree.Transaction.refund(str(transaction_id), amount)
         status = "success" if response.is_success else "failure"
         result = {
