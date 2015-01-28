@@ -131,8 +131,8 @@ class BraintreeGateway(Gateway):
         return result
 
     def refund(self, transaction_id, amount=None):
-        transaction = self.get_transaction(str(transaction_id))
-        response = braintree.Transaction.refund(str(transaction_id), amount)
+        transaction = self.get_transaction(transaction_id)
+        response = braintree.Transaction.refund(transaction_id, amount)
         status = "success" if response.is_success else "failure"
         result = {
             "status": status,
@@ -141,4 +141,13 @@ class BraintreeGateway(Gateway):
             }
         }
         result.update(self._build_errors(response, transaction) or {})
+        return result
+
+    def void(self, transaction_id):
+        # To void a transaction the status should be authorized or
+        # submitted for settlement
+        response = braintree.Transaction.void(transaction_id)
+        status = "success" if response.is_success else "failure"
+        result = {"status": status}
+        result.update(self._build_errors(response) or {})
         return result

@@ -58,6 +58,7 @@ class BraintreeGatewayTests(TestCase):
                                         gateway_settings=(
                                             plan_settings.GATEWAY_SETTINGS
                                         ))
+
     def gen_amount(self):
         return random.randint(1, 1000)
 
@@ -109,3 +110,10 @@ class BraintreeGatewayTests(TestCase):
         self.assertEqual(response["status"], "failure")
         self.assertEqual(response["transaction"]["status"],
                          "submitted_for_settlement")
+
+    def test_void_transaction(self):
+        amount = self.gen_amount()
+        response = self.gateway.charge(visa_card, amount)
+        assert response["status"] == "success"
+        response = self.gateway.void(response["transaction"]["id"])
+        self.assertEqual(response["status"], "success")
