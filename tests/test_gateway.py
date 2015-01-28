@@ -58,6 +58,8 @@ class BraintreeGatewayTests(TestCase):
                                         gateway_settings=(
                                             plan_settings.GATEWAY_SETTINGS
                                         ))
+    def gen_amount(self):
+        return random.randint(1, 1000)
 
     def test_gateway_initialisation(self):
         import braintree
@@ -76,7 +78,8 @@ class BraintreeGatewayTests(TestCase):
         self.assertTrue(ret)
 
     def test_charge_success(self):
-        response = self.gateway.charge(visa_card, 100)
+        amount = self.gen_amount()
+        response = self.gateway.charge(visa_card, amount)
         self.assertEqual(response['status'], "success")
 
     @raises(credit_card.InvalidCard)
@@ -100,7 +103,7 @@ class BraintreeGatewayTests(TestCase):
         # Use random amount, to be sure that the braintree gateway will not
         # consider the created transaction duplicated, See:
         # http://support.braintreepayments.com/customer/portal/articles/1429427-processing-options#Duplicate
-        amount = random.randint(1, 1000)
+        amount = self.gen_amount()
         charge_response = self.gateway.charge(visa_card, amount)
         response = self.gateway.refund(charge_response["transaction"]["id"])
         self.assertEqual(response["status"], "failure")
