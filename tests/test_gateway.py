@@ -117,3 +117,15 @@ class BraintreeGatewayTests(TestCase):
         assert response["status"] == "success"
         response = self.gateway.void(response["transaction"]["id"])
         self.assertEqual(response["status"], "success")
+
+    @raises(ValueError)
+    def test_subscription_fails(self):
+        # This test should fails, because we didn't specified a plan
+        self.gateway.subscribe(visa_card)
+
+    def test_subscription_success(self):
+        options = {
+            "plan_id": "tester"
+        }
+        response = self.gateway.subscribe(visa_card, options)
+        self.assertEqual(response["status"], "success")
