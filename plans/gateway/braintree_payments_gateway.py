@@ -90,6 +90,47 @@ class BraintreeGateway(Gateway):
         # shipping address
         return request
 
+    def _get_or_create_token(self, credit_card, token=None):
+        gateway_credit_card = None
+        if token:
+            gateway_credit_card = braintree.CreditCard.find(token)
+        if gateway_credit_card:
+            return gateway_credit_card.token
+
+        # firstly, we should search for the given credit card
+        search_resp = braintree.Customer.search(
+            braintree.CustomerSearch.cardholder_name == credit_card.name,
+            braintree.CustomerSearch.credit_card_number.starts_with(
+                credit_card.number[:6]),
+            braintree.CustomerSearch.credit_card_number.ends_with(
+                credit_card.number[-4:]),
+            braintree.CustomerSearch.credit_card_expiration_date == (
+                credit_card.expiration_date)
+        )
+        credit_cards = []
+        for customer in search_resp.items:
+            credit_cards.extend(customer.credit_cards)
+        credit_cards = [cc for cc in credit_cards
+                        if cc.cardholder_name == credit_card.name
+                        and cc.expiration_date == credit_card.expiration_date
+                        and cc.bin.startswith(credit_card.number[:6])
+                        and cc.last_4 == credit_card.number[-4:]
+                        ]
+        if credit_cards:
+            return credit_cards[0].token
+
+        result = braintree.Customer.create({
+            "credit_card": {
+                "number": credit_card.number,
+                "cardholder_name": credit_card.name,
+                "expiration_date": credit_card.expiration_date,
+                "cvv": credit_card.cvv
+            }
+        })
+        if result.is_success:
+            return result.customer.credit_cards[0].token2
+        return self._build_errors(result)
+
     def charge(self, credit_card, amount, options=None):
         try:
             is_valid = (isinstance(credit_card, CreditCard)
@@ -151,3 +192,19 @@ class BraintreeGateway(Gateway):
         result = {"status": status}
         result.update(self._build_errors(response) or {})
         return result
+
+    def subscribe(self, credit_card, options=None):
+        options = options or {}
+        plan_id = options.get("plan_id", None)
+        payment_method_token = options.get("payment_method_token", None)
+        if not plan_id:
+            raise ValueError("plan_id is required")
+        token = self._get_or_create_token(credit_card, payment_method_token)
+        options.update({"payment_method_token": token})
+        result = braintree.Subscription.create(options)
+        status = "success" if result.is_success else "failure"
+        return {
+            "status": status,
+            "id": result.subscription.id if result.subscription else None,
+            "subscription": result.subscription
+        }
