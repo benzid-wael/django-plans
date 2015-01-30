@@ -29,6 +29,7 @@ class MultipleRunningSubscriptionError(Exception):
 
 @python_2_unicode_compatible
 class Plan(models.Model):
+
     """
     Plan model.
     """
@@ -73,6 +74,7 @@ class Plan(models.Model):
 
 @python_2_unicode_compatible
 class BillingInfo(models.Model):
+
     """
     Stores customer billing information.
     """
@@ -109,6 +111,7 @@ class BillingInfo(models.Model):
 
 @python_2_unicode_compatible
 class UserVault(models.Model):
+
     """
     Stores User vaults.
     """
@@ -167,6 +170,7 @@ class UserVault(models.Model):
 
 @python_2_unicode_compatible
 class PaymentLog(models.Model):
+
     """
     Logging raw charges made to a users credit card.
     """
@@ -187,6 +191,7 @@ class PaymentLog(models.Model):
 
 @python_2_unicode_compatible
 class Subscription(models.Model):
+
     """
     Stores subscription.
 

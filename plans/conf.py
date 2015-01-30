@@ -43,9 +43,11 @@ class NotFoundAttribute(Exception):
 
 
 class Settings(object):
+
     """
     A settings object that allows us to access to all settings as properties.
     """
+
     def __init__(self, user_settings, default_settings, import_strings):
         self.user_settings = user_settings or {}
         self.default_settings = default_settings or {}

@@ -8,6 +8,7 @@ class GatewayNotConfigured(Exception):
 
 
 class Gateway(object):
+
     """
     Base class for all billing gateways.
     """

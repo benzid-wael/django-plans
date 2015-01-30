@@ -20,6 +20,7 @@ class RegExpError(Exception):
 
 
 class CreditCard(object):
+
     """
     Class to represents the existing credit cards and validate it.
     """
